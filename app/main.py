@@ -3,8 +3,9 @@ from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from app.core.config import get_settings
-from app.core.models import ProcessResponse, TextInvoiceRequest
+from app.core.models import ObservabilityResponse, ObservabilityRun, ProcessResponse, TextInvoiceRequest
 from app.orchestrator import InvoiceWorkflow
+from app.services.observability import observability_store
 from app.services.pdf_reader import read_pdf_text
 
 
@@ -17,6 +18,11 @@ app.mount("/static", StaticFiles(directory=root / "static"), name="static")
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(root / "templates" / "index.html")
+
+
+@app.get("/observability")
+def observability() -> FileResponse:
+    return FileResponse(root / "templates" / "observability.html")
 
 
 @app.get("/api/health")
@@ -34,6 +40,7 @@ def health() -> dict[str, str]:
 def process_text(payload: TextInvoiceRequest) -> ProcessResponse:
     workflow = InvoiceWorkflow(settings)
     state = workflow.process(payload.text)
+    observability_store.record(state)
     return ProcessResponse(**state.model_dump())
 
 
@@ -50,5 +57,18 @@ async def process_pdf(file: UploadFile = File(...)) -> ProcessResponse:
         )
     workflow = InvoiceWorkflow(settings)
     state = workflow.process(text)
+    observability_store.record(state)
     return ProcessResponse(**state.model_dump())
 
+
+@app.get("/api/observability/runs", response_model=ObservabilityResponse)
+def list_observability_runs() -> ObservabilityResponse:
+    return observability_store.list_runs()
+
+
+@app.get("/api/observability/runs/{workflow_id}", response_model=ObservabilityRun)
+def get_observability_run(workflow_id: str) -> ObservabilityRun:
+    run = observability_store.get_run(workflow_id)
+    if not run:
+        raise HTTPException(status_code=404, detail="Workflow run not found.")
+    return run

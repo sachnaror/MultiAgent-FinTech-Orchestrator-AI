@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Observability | Multi-Agent FinTech Orchestrator AI</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Observability</p>
+          <h1>Agent Audit Trail</h1>
+        </div>
+        <div class="top-actions">
+          <a class="nav-link" href="/">Run invoice</a>
+          <button type="button" id="refresh-runs">Refresh</button>
+        </div>
+      </section>
+
+      <section class="panel audit-panel">
+        <div class="panel-head">
+          <h2>All Runs</h2>
+          <span id="run-count">0 runs</span>
+        </div>
+        <div id="runs" class="run-list"></div>
+      </section>
+    </main>
+    <script src="/static/observability.js"></script>
+  </body>
+</html>

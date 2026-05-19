@@ -81,3 +81,19 @@ class ProcessResponse(BaseModel):
     validation: ValidationResult | None
     audit: list[AgentRun]
 
+
+class ObservabilityRun(BaseModel):
+    workflow_id: str
+    status: AgentStatus
+    decision: Decision | None
+    decision_reason: str | None
+    vendor: str | None = None
+    invoice_id: str | None = None
+    total_amount: float | None = None
+    validation_issues: list[ValidationIssue] = Field(default_factory=list)
+    stateful_checkpoints: list[AgentRun] = Field(default_factory=list)
+
+
+class ObservabilityResponse(BaseModel):
+    total_runs: int
+    runs: list[ObservabilityRun]

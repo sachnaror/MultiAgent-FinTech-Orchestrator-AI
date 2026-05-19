@@ -46,6 +46,26 @@ body {
   margin-bottom: 20px;
 }
 
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 14px;
+  color: var(--blue);
+  background: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .workspace {
   align-items: stretch;
 }
@@ -171,6 +191,53 @@ button.primary {
   margin: 8px 0;
 }
 
+.run-list {
+  display: grid;
+  gap: 12px;
+}
+
+.run-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fbfcfd;
+}
+
+.run-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.run-summary p {
+  overflow-wrap: anywhere;
+}
+
+.run-section {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.run-section h3 {
+  margin-top: 0;
+}
+
+.checkpoint-list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.checkpoint-list li {
+  margin: 10px 0;
+}
+
+.checkpoint-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .critical {
   color: var(--red);
 }
@@ -205,5 +272,8 @@ button.primary {
     flex-direction: column;
     align-items: stretch;
   }
-}
 
+  .run-summary {
+    grid-template-columns: 1fr;
+  }
+}

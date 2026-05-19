@@ -1,8 +1,11 @@
 import unittest
+from fastapi.testclient import TestClient
 from app.core.config import Settings
 from app.core.models import Decision, AgentStatus
+from app.main import app
 from app.orchestrator import InvoiceWorkflow
 from app.services.duplicate_store import duplicate_store
+from app.services.observability import observability_store
 
 
 VALID_INVOICE = """Vendor: ABC Ltd
@@ -15,6 +18,7 @@ Total Amount: 5000"""
 class WorkflowTests(unittest.TestCase):
     def setUp(self):
         duplicate_store.seen.clear()
+        observability_store.clear()
         self.settings = Settings(
             auto_approve_max_amount=10000,
             min_extraction_confidence=0.8,
@@ -52,7 +56,30 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(second.decision, Decision.reject)
         self.assertIn("DUPLICATE_INVOICE", {issue.code for issue in second.validation.issues})
 
+    def test_api_records_audit_trail_for_observability(self):
+        client = TestClient(app)
+        response = client.post("/api/process-text", json={"text": VALID_INVOICE.replace("INV777", "INV900")})
+        self.assertEqual(response.status_code, 200)
+
+        runs = client.get("/api/observability/runs").json()
+
+        self.assertEqual(runs["total_runs"], 1)
+        self.assertEqual(runs["runs"][0]["decision"], "AUTO_APPROVE")
+        self.assertGreaterEqual(len(runs["runs"][0]["stateful_checkpoints"]), 3)
+        self.assertEqual(runs["runs"][0]["validation_issues"], [])
+
+    def test_api_records_validation_issues_for_observability(self):
+        client = TestClient(app)
+        invalid = VALID_INVOICE.replace("INV777", "INV901").replace("Total Amount: 5000", "Total Amount: 4500")
+        response = client.post("/api/process-text", json={"text": invalid})
+        self.assertEqual(response.status_code, 200)
+
+        runs = client.get("/api/observability/runs").json()
+
+        issue_codes = {issue["code"] for issue in runs["runs"][0]["validation_issues"]}
+        self.assertIn("TOTAL_MISMATCH", issue_codes)
+        self.assertGreaterEqual(len(runs["runs"][0]["stateful_checkpoints"]), 3)
+
 
 if __name__ == "__main__":
     unittest.main()
-
