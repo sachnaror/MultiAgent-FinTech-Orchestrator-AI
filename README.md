@@ -15,9 +15,11 @@ The important design choice: downstream agents treat upstream output as a hypoth
 ## Top 10 Confirmation Questions
 
 1. Which invoice PDF formats must be supported first: native text PDFs, scanned images, or both?
+
    Answer: This application currently supports native text PDFs through the local PDF text parser. Scanned PDFs are not processed locally yet; Azure Document Intelligence is configured as the intended OCR/document extraction service through environment variables.
 
 2. What is the source of truth for vendor validation: internal DB, ERP API, Azure SQL, or a CSV upload?
+
    Answer: This application currently validates vendors against the in-memory vendor repository loaded from `sample_data/vendors.json`.
 
 3. What duplicate invoice rules matter: same vendor plus invoice ID, same total/date, or fuzzy matching?
