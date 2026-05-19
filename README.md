@@ -23,27 +23,35 @@ The important design choice: downstream agents treat upstream output as a hypoth
    Answer: This application currently validates vendors against the in-memory vendor repository loaded from `sample_data/vendors.json`.
 
 3. What duplicate invoice rules matter: same vendor plus invoice ID, same total/date, or fuzzy matching?
+
    Answer: This application currently detects duplicates by matching the same `vendor + invoice_id`.
 
 4. What auto-approval threshold should be used for total amount and confidence score?
+
    Answer: This application currently auto-approves only when the invoice amount is at or below `AUTO_APPROVE_MAX_AMOUNT`, extraction confidence is at or above `MIN_EXTRACTION_CONFIDENCE`, and Agent B reports no validation issues.
 
 5. What should count as a minor issue versus a hard rejection?
+
    Answer: This application currently sends major issues, such as low confidence or unclear source grounding, to human review. It rejects critical issues, such as an unknown vendor, duplicate invoice, missing source grounding for key fields, or total mismatch.
 
 6. Where should human-review tasks be created: email, Teams, ServiceNow, Jira, or an internal queue?
+
    Answer: This application currently represents human review as a workflow decision and audit event in the API/UI response. It does not create external tickets or messages yet.
 
 7. Which Azure services are approved: Azure Document Intelligence, Azure OpenAI, Azure SQL, Storage, Service Bus, App Insights?
+
    Answer: This application currently includes configuration fields for Azure Document Intelligence and Azure OpenAI in `.env.example`. The running demo uses local parsing and rule-based validation, so no live Azure service call is required.
 
 8. What audit retention and compliance requirements apply to invoices and decisions?
+
    Answer: This application currently keeps audit events in the workflow response, including each agent name, status, message, extracted data, validation issues, and decision reason. It does not persist audit records to a database yet.
 
 9. Should the workflow fail fast on incomplete state, or route safely to human review?
+
    Answer: This application currently fails fast on incomplete or corrupted state before the next agent runs. Complete but uncertain data is routed to human review.
 
 10. Which downstream finance system receives approved invoices: ERP, AP system, payment rail, or data warehouse?
+
     Answer: This application currently returns the approval decision through the API/UI response. It does not send approved invoices to an ERP, AP system, payment rail, or data warehouse yet.
 
 ## Run Locally
