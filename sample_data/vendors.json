@@ -1,0 +1,21 @@
+[
+  {
+    "vendor_id": "ven_abc",
+    "name": "ABC Ltd",
+    "status": "active",
+    "allowed_invoice_prefixes": ["INV", "ABC"]
+  },
+  {
+    "vendor_id": "ven_northwind",
+    "name": "Northwind Traders",
+    "status": "active",
+    "allowed_invoice_prefixes": ["NW", "INV"]
+  },
+  {
+    "vendor_id": "ven_old",
+    "name": "Old Supplier LLC",
+    "status": "blocked",
+    "allowed_invoice_prefixes": ["OLD"]
+  }
+]
+

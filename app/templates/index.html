@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Multi-Agent FinTech Orchestrator AI</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Invoice workflow</p>
+          <h1>Multi-Agent FinTech Orchestrator AI</h1>
+        </div>
+        <div class="status-pill" id="health">Checking</div>
+      </section>
+
+      <section class="workspace">
+        <form class="panel input-panel" id="invoice-form">
+          <div class="panel-head">
+            <h2>Invoice Source</h2>
+            <button type="button" id="load-sample">Load sample</button>
+          </div>
+          <textarea id="invoice-text" aria-label="Invoice text" spellcheck="false"></textarea>
+          <button class="primary" type="submit">Run orchestration</button>
+        </form>
+
+        <section class="panel result-panel">
+          <div class="panel-head">
+            <h2>Decision</h2>
+            <span id="decision-badge">Idle</span>
+          </div>
+          <p id="decision-reason" class="reason">Submit an invoice to see the workflow result.</p>
+
+          <div class="grid">
+            <div>
+              <p class="label">Vendor</p>
+              <p id="vendor">-</p>
+            </div>
+            <div>
+              <p class="label">Invoice ID</p>
+              <p id="invoice-id">-</p>
+            </div>
+            <div>
+              <p class="label">Total</p>
+              <p id="total">-</p>
+            </div>
+            <div>
+              <p class="label">Confidence</p>
+              <p id="confidence">-</p>
+            </div>
+          </div>
+
+          <h3>Validation Issues</h3>
+          <ul id="issues" class="issues"></ul>
+        </section>
+      </section>
+
+      <section class="panel audit-panel">
+        <div class="panel-head">
+          <h2>Agent Audit Trail</h2>
+          <span>Stateful checkpoints</span>
+        </div>
+        <ol id="audit"></ol>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
+
