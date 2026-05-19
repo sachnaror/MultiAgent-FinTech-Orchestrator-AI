@@ -12,6 +12,17 @@ PDF invoice
 
 The important design choice: downstream agents treat upstream output as a hypothesis, not a fact. Agent B re-checks source evidence and business rules before Agent C can make a decision.
 
+## Current Features
+
+- Stateful multi-agent invoice workflow with Extractor, Validator, and Decision agents
+- Explicit trust boundary between agents: Validator re-checks source evidence instead of blindly trusting Extractor output
+- Fail-fast state gates that stop incomplete or corrupted workflow state before it reaches downstream agents
+- Validation checks for vendor existence, duplicate invoices, source grounding, line item math, total mismatch, and extraction confidence
+- Decision handling for auto-approval, human review, rejection, and stopped workflows
+- Observability page that records every workflow run with stateful checkpoints, validation issues, final status, and decision reason
+- API endpoints for processing invoice text, processing PDFs, health checks, and reading observability run history
+- Azure-ready configuration for Document Intelligence and Azure OpenAI through environment variables
+
 ## Top 10 Confirmation Questions
 
 1. Which invoice PDF formats must be supported first: native text PDFs, scanned images, or both?
@@ -36,7 +47,7 @@ The important design choice: downstream agents treat upstream output as a hypoth
 
 6. Where should human-review tasks be created: email, Teams, ServiceNow, Jira, or an internal queue?
 
-   Answer: This application currently represents human review as a workflow decision and audit event in the API/UI response. It does not create external tickets or messages yet.
+   Answer: This application currently represents human review as a workflow decision, an audit event in the per-run response, and a retained observability record. It does not create external tickets or messages yet.
 
 7. Which Azure services are approved: Azure Document Intelligence, Azure OpenAI, Azure SQL, Storage, Service Bus, App Insights?
 
@@ -44,7 +55,7 @@ The important design choice: downstream agents treat upstream output as a hypoth
 
 8. What audit retention and compliance requirements apply to invoices and decisions?
 
-   Answer: This application currently keeps audit events in the workflow response, including each agent name, status, message, extracted data, validation issues, and decision reason. It does not persist audit records to a database yet.
+   Answer: This application currently records audit events in the workflow response and in the in-memory observability store. Each recorded run includes stateful checkpoints, agent status, agent messages, extracted invoice summary, validation issues, final decision, and decision reason. It does not persist audit records to a database yet.
 
 9. Should the workflow fail fast on incomplete state, or route safely to human review?
 
@@ -63,18 +74,23 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-Open `http://127.0.0.1:8000`.
+Open:
+
+- Main workflow UI: `http://127.0.0.1:8000`
+- Observability UI: `http://127.0.0.1:8000/observability`
 
 ## Observability
 
-After processing an invoice, open `http://127.0.0.1:8000/observability` to see all recorded workflow runs.
+After processing an invoice, open `http://127.0.0.1:8000/observability` to see all recorded workflow runs. This is where success, rejection, stopped runs, stateful checkpoints, and validation issues are visible across runs.
 
 The observability page shows:
 
-- Stateful checkpoints for every agent run
-- Validation issues, if any
-- Final workflow status and decision
+- Stateful checkpoints for every agent run, including Extractor, Validator, Decision Agent, and Workflow Guard
+- Validation issues, if any, including issue code, severity, message, and field
+- Final workflow status and decision, such as `AUTO_APPROVE`, `HUMAN_REVIEW`, `REJECT`, or `STOPPED`
 - Vendor, invoice ID, total amount, and decision reason
+
+The observability store is currently in memory. Restarting the server clears the recorded run history.
 
 The same data is available through:
 
@@ -85,10 +101,31 @@ curl http://127.0.0.1:8000/api/observability/runs/{workflow_id}
 
 ## Try The API
 
+Process invoice text:
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/process-text \
   -H "Content-Type: application/json" \
   -d @sample_data/sample_invoice.json
+```
+
+Process a PDF:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/process-pdf \
+  -F "file=@/path/to/invoice.pdf"
+```
+
+Read all recorded observability runs:
+
+```bash
+curl http://127.0.0.1:8000/api/observability/runs
+```
+
+Read one recorded observability run:
+
+```bash
+curl http://127.0.0.1:8000/api/observability/runs/{workflow_id}
 ```
 
 ## Azure Configuration
