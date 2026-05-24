@@ -2,3 +2,11 @@
   "text": "Vendor: ABC Ltd\nInvoice Number: INV123\nItem: Cloud hosting | Qty: 2 | Unit Price: 1500 | Amount: 3000\nItem: Support retainer | Qty: 1 | Unit Price: 2000 | Amount: 2000\nTotal Amount: 5000"
 }
 
+
+// {
+//   "text": "Vendor: Northwind Traders\nInvoice Number: NW456\nItem: API subscription | Qty: 3 | Unit Price: 1200 | Amount: 3600\nItem: Maintenance support | Qty: 1 | Unit Price: 1400 | Amount: 1400\nTotal Amount: 5000"
+// }
+
+// {
+//   "text": "Vendor: Old Supplier LLC\nInvoice Number: OLD789\nItem: Legacy software license | Qty: 1 | Unit Price: 3500 | Amount: 3500\nItem: Annual support | Qty: 1 | Unit Price: 1500 | Amount: 1500\nTotal Amount: 5000"
+// }
